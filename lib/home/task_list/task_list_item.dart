@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todo_app/app_colors.dart';
+import 'package:todo_app/model/task.dart';
 
 class TaskListItem extends StatelessWidget {
+  Task task;
+
+  TaskListItem({required this.task});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,21 +44,20 @@ class TaskListItem extends StatelessWidget {
               SizedBox(
                 width: 10,
               ),
-              Expanded(
-                  child: Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'title',
+                    task.title,
                     style:
                         TextStyle(color: AppColors.primaryColor, fontSize: 25),
                   ),
                   Text(
-                    'date',
+                    task.desc,
                     style: TextStyle(fontSize: 15),
                   )
                 ],
-              )),
+              ),
               ElevatedButton(
                 style: ButtonStyle(
                     backgroundColor:
