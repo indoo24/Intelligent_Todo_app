@@ -20,7 +20,7 @@ class Task {
             id: data['id'],
             title: data['title'],
             desc: data['desc'],
-            dateTime: data['dateTime'],
+            dateTime: DateTime.fromMillisecondsSinceEpoch(data['dateTime']),
             isDone: data['isDone']);
 
   Map<String, Object?> toFireStore() {
@@ -28,7 +28,7 @@ class Task {
       'title': title,
       'id': id,
       'desc': desc,
-      'dateTime': dateTime,
+      'dateTime': dateTime!.millisecondsSinceEpoch,
       'isDone': isDone,
     };
   }

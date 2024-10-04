@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 
 class DialogUtils {
-  static void showLoading(BuildContext context, String message) {
+  static void showLoading(
+      {required BuildContext context, required String message}) {
     showDialog(
-        barrierDismissible: false,
         context: context,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
             content: Row(
               children: [
                 CircularProgressIndicator(),
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Text(message),
-                ),
+                )
               ],
             ),
           );
@@ -24,12 +25,34 @@ class DialogUtils {
     Navigator.pop(context);
   }
 
-  static showMessage(
+  static void showMessage(
       {required BuildContext context,
       required String content,
       String title = '',
-      String button = 'ok',
-      Function? function}) {
+      String? posActionName,
+      Function? posAction,
+      String? negActionName,
+      Function? negAction}) {
+    List<Widget> actions = [];
+    if (posActionName != null) {
+      actions.add(TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            // if(posAction != null){
+            //   posAction.call();
+            // }
+            posAction?.call();
+          },
+          child: Text(posActionName)));
+    }
+    if (negActionName != null) {
+      actions.add(TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            negAction?.call();
+          },
+          child: Text(negActionName)));
+    }
     showDialog(
         context: context,
         builder: (context) {
@@ -37,16 +60,9 @@ class DialogUtils {
             content: Text(content),
             title: Text(
               title,
-              style: TextStyle(color: Colors.black),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            actions: [
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop;
-                    function?.call();
-                  },
-                  child: Text(button)),
-            ],
+            actions: actions,
           );
         });
   }

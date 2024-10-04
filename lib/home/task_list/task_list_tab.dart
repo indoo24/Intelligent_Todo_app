@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/home/task_list/task_list_item.dart';
 import 'package:todo_app/provider/list_provider.dart';
+import 'package:todo_app/provider/user_provider.dart';
 
 class TaskListTab extends StatefulWidget {
   @override
@@ -13,14 +14,17 @@ class _TaskListTabState extends State<TaskListTab> {
   @override
   Widget build(BuildContext context) {
     var listProvider = Provider.of<ListProvider>(context);
-
-    ListProvider.getAllTasksFromFireStore();
+    var userProvider = Provider.of<UserProvider>(context);
+    if (listProvider.tasksList.isEmpty) {
+      listProvider.getAllTasksFromFireStore(userProvider.currentUser!.id!);
+    }
 
     return Column(children: [
       EasyDateTimeLine(
-        initialDate: DateTime.now(),
+        initialDate: listProvider.selectDate,
         onDateChange: (selectedDate) {
-          //`selectedDate` the new date selected.
+          listProvider.changeSelectDate(
+              selectedDate, userProvider.currentUser!.id!);
         },
         headerProps: const EasyHeaderProps(
           monthPickerType: MonthPickerType.switcher,
@@ -49,10 +53,10 @@ class _TaskListTabState extends State<TaskListTab> {
         child: ListView.builder(
           itemBuilder: (contest, index) {
             return TaskListItem(
-              task: ListProvider.tasksList[index],
+              task: listProvider.tasksList[index],
             );
           },
-          itemCount: ListProvider.tasksList.length,
+          itemCount: listProvider.tasksList.length,
         ),
       )
     ]);

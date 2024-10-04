@@ -8,5 +8,4 @@ class AssetsRes {
 
   static const String PLUGIN_NAME = 'todo_app';
   static const String PLUGIN_VERSION = '1.0.0+1';
-  static const String BACKGROUND = 'assets/images/background.png';
 }

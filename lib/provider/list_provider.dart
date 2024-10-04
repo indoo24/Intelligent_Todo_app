@@ -6,22 +6,39 @@ import 'package:todo_app/model/task.dart';
 class ListProvider extends ChangeNotifier {
   String appLanguage = 'en';
 
-  void changeLanguage(String newLanguage) {
-    if (appLanguage == newLanguage) {
-      return;
-    }
-    appLanguage = newLanguage;
-  }
+  List<Task> tasksList = [];
+  var selectDate = DateTime.now();
 
-  static List<Task> tasksList = [];
-
-  static void getAllTasksFromFireStore() async {
+  void getAllTasksFromFireStore(String uId) async {
     QuerySnapshot<Task> querySnapshot =
-        await FirebaseUtils.getTasksCollection().get();
+        await FirebaseUtils.getTasksCollection(uId).get();
+
+    /// List<Task>      List<QueryDocumentSnapshot<Task>>
     tasksList = querySnapshot.docs.map((doc) {
       return doc.data();
     }).toList();
+
+    /// filter all tasks => select date
+    tasksList = tasksList.where((task) {
+      if (selectDate.day == task.dateTime.day &&
+          selectDate.month == task.dateTime.month &&
+          selectDate.year == task.dateTime.year) {
+        return true;
+      }
+      return false;
+    }).toList();
+
+    /// sorting tasks => select date
+    tasksList.sort((Task task1, Task task2) {
+      return task1.dateTime.compareTo(task2.dateTime);
+    });
+
+    notifyListeners();
   }
 
-  notifyListeners();
+  void changeSelectDate(DateTime newSelectDate, String uId) {
+    selectDate = newSelectDate;
+    getAllTasksFromFireStore(uId);
+    notifyListeners();
+  }
 }

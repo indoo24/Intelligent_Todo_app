@@ -10,6 +10,7 @@ import 'package:todo_app/auth/register/regiter_screen.dart';
 import 'package:todo_app/home/home_screen.dart';
 import 'package:todo_app/my_theme_data.dart';
 import 'package:todo_app/provider/list_provider.dart';
+import 'package:todo_app/provider/user_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,11 +22,20 @@ void main() async {
               messagingSenderId: '583743039074',
               projectId: 'todo-app-36d7d'))
       : await Firebase.initializeApp();
-  await FirebaseFirestore.instance.disableNetwork();
-  runApp(ChangeNotifierProvider(
-      create: (context) => ListProvider(), child: Myapp()));
+  await FirebaseFirestore.instance.enableNetwork();
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => ListProvider()),
+      ChangeNotifierProvider(
+        create: (context) => UserProvider(),
+      )
+    ],
+    child: myApp(),
+  ));
 }
-class Myapp extends StatelessWidget {
+
+class myApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ListProvider>(context);
