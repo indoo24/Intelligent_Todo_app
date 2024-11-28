@@ -92,6 +92,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                     FloatingActionButton(
                       onPressed: () {
                         addTask();
+                        Navigator.of(context).pop();
                       },
                       child: Icon(
                         Icons.check,

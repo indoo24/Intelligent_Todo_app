@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           title: Text(
             selectedIndex == 0
-                ? 'To Do List <[${userProvider.currentUser!.name!}]>'
+                ? 'To Do List <[${userProvider.currentUser!.name}]>'
                 : 'Settings',
             style: Theme.of(context).textTheme.titleLarge,
           ),

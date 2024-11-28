@@ -36,7 +36,6 @@ class TaskListItem extends StatelessWidget {
                 FirebaseUtils.deleteTaskFromFireStore(
                         task, userProvider.currentUser!.id!)
                     .then((value) {
-                  print('task delete successfully');
                   listProvider
                       .getAllTasksFromFireStore(userProvider.currentUser!.id!);
                 }).timeout(
@@ -44,8 +43,6 @@ class TaskListItem extends StatelessWidget {
                           seconds: 1,
                         ), onTimeout: () {
                   print('task delete successfully');
-                  listProvider
-                      .getAllTasksFromFireStore(userProvider.currentUser!.id!);
                 });
               },
             ),
