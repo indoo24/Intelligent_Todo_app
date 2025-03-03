@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'model/my_user.dart';
 import 'model/task.dart';
@@ -47,5 +48,12 @@ class FirebaseUtils {
   static Future<MyUser?> readUserFromFireStore(String uId) async {
     var querySnapshot = await getUsersCollection().doc(uId).get();
     return querySnapshot.data();
+  }
+
+  static void signOut() async {
+    await FirebaseAuth.instance
+        .signOut()
+        .then((value) => print("Signed Out"))
+        .catchError((error) => print("Failed to sign out: $error"));
   }
 }

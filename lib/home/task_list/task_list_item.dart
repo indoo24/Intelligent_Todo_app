@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 
-import '../../app_colors.dart';
 import '../../firebase_utils.dart';
 import '../../model/task.dart';
 import '../../provider/list_provider.dart';
 import '../../provider/user_provider.dart';
+import '../../style/app_colors.dart';
 
 class TaskListItem extends StatelessWidget {
   Task task;

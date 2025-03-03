@@ -2,11 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../app_colors.dart';
 import '../../dialog_utils.dart';
 import '../../firebase_utils.dart';
 import '../../home/home_screen.dart';
 import '../../provider/user_provider.dart';
+import '../../style/app_colors.dart';
 import '../custome_text_form_field.dart';
 import '../register/register_screen.dart';
 

@@ -4,10 +4,10 @@ import 'package:todo_app/home/settings/settings_tab.dart';
 import 'package:todo_app/home/task_list/add_task_bottom_sheet.dart';
 import 'package:todo_app/home/task_list/task_list_tab.dart';
 
-import '../app_colors.dart';
 import '../auth/login/login_screen.dart';
 import '../provider/list_provider.dart';
 import '../provider/user_provider.dart';
+import '../style/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'home_screen';
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             width: double.infinity,
             height: MediaQuery.of(context).size.height * 0.08,
           ),
-          Expanded(child: selectedIndex == 0 ? TaskListTab() : SettingsTab()
+          Expanded(child: selectedIndex == 0 ? TaskListTab() : Settings()
               // tabs[selectedIndex]
               )
         ],

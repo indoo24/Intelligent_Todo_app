@@ -7,9 +7,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/auth/login/login_screen.dart';
 import 'package:todo_app/home/home_screen.dart';
-import 'package:todo_app/my_theme_data.dart';
+import 'package:todo_app/provider/firbase_provider.dart';
 import 'package:todo_app/provider/list_provider.dart';
+import 'package:todo_app/provider/select_language.dart';
+import 'package:todo_app/provider/select_theme.dart';
 import 'package:todo_app/provider/user_provider.dart';
+import 'package:todo_app/style/my_theme_data.dart';
 
 import 'auth/register/register_screen.dart';
 
@@ -28,9 +31,10 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => ListProvider()),
-      ChangeNotifierProvider(
-        create: (context) => UserProvider(),
-      )
+      ChangeNotifierProvider(create: (context) => UserProvider()),
+      ChangeNotifierProvider(create: (context) => SelectLanguage()),
+      ChangeNotifierProvider(create: (context) => SelectTheme()),
+      ChangeNotifierProvider(create: (context) => FireBaseProvider()),
     ],
     child: myApp(),
   ));
@@ -40,6 +44,8 @@ class myApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ListProvider>(context);
+    var languageProvider = Provider.of<SelectLanguage>(context);
+    var themeProvider = Provider.of<SelectTheme>(context);
     return MaterialApp(
       theme: MyThemeData.lightTheme,
       debugShowCheckedModeBanner: false,
@@ -49,7 +55,9 @@ class myApp extends StatelessWidget {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
       },
-      // locale: Locale(provider.appLanguage),
+      themeMode: themeProvider.themeState,
+      darkTheme: MyThemeData.darkTheme,
+      locale: Locale(languageProvider.appLanguage),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     );

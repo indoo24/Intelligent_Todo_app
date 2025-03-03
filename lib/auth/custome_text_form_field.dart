@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../app_colors.dart';
+import '../style/app_colors.dart';
 
 // typedef MyValidator = String? Function(String?);
 

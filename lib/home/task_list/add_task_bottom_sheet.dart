@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_app/app_colors.dart';
 
 import '../../firebase_utils.dart';
 import '../../model/task.dart';
 import '../../provider/list_provider.dart';
 import '../../provider/user_provider.dart';
+import '../../style/app_colors.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
   @override
@@ -76,7 +76,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                       child: Text(
                         'Select Date',
                         textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.titleSmall,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
                     Padding(
