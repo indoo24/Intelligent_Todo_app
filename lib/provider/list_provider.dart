@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-import 'package:todo_app/home/firebase_utils.dart';
-import 'package:todo_app/model/task.dart';
+import 'package:flutter/material.dart';
+
+import '../firebase_utils.dart';
+import '../model/task.dart';
 
 class ListProvider extends ChangeNotifier {
-  String appLanguage = 'en';
-
+  /// data
   List<Task> tasksList = [];
   var selectDate = DateTime.now();
 

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/app_colors.dart';
-import 'package:todo_app/home/firebase_utils.dart';
-import 'package:todo_app/model/task.dart';
-import 'package:todo_app/provider/list_provider.dart';
-import 'package:todo_app/provider/user_provider.dart';
+
+import '../../firebase_utils.dart';
+import '../../model/task.dart';
+import '../../provider/list_provider.dart';
+import '../../provider/user_provider.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
   @override
@@ -15,23 +16,26 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   var selectedDate = DateTime.now();
   var formKey = GlobalKey<FormState>();
   String title = '';
-  String desc = '';
+  String description = '';
   late ListProvider listProvider;
 
   @override
   Widget build(BuildContext context) {
-    var listProvider = Provider.of<ListProvider>(context);
+    listProvider = Provider.of<ListProvider>(context);
     return Container(
-        margin: EdgeInsets.all(15),
-        color: AppColors.whiteColor,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text('Add new task',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              Form(
-                  key: formKey,
-                  child: Column(children: [
+      margin: EdgeInsets.all(12),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text(
+              ' Add new Task',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Form(
+                key: formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: TextFormField(
@@ -43,76 +47,91 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                             return 'Please enter task title';
                           }
                           return null;
+
+                          /// valid
                         },
                         decoration:
                             InputDecoration(hintText: 'Enter task title'),
-                        maxLines: 1,
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: TextFormField(
                         onChanged: (text) {
-                          desc = text;
+                          description = text;
                         },
                         validator: (text) {
                           if (text == null || text.isEmpty) {
-                            return 'Please enter task des';
+                            return 'Please enter task description';
                           }
                           return null;
                         },
                         decoration:
-                            InputDecoration(hintText: 'Enter task description'),
-                        maxLines: 4,
+                            InputDecoration(hintText: 'Enter task Description'),
+                        maxLines: 1,
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: Text('Select Date',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontSize: 25)),
+                      child: Text(
+                        'Select Date',
+                        textAlign: TextAlign.start,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: TextButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              AppColors.backgroundLightColor),
+                          shape:
+                              MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          )),
+                        ),
                         onPressed: () {
-                          showCalender();
+                          showCalendar();
                         },
                         child: Text(
-                            '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                    fontSize: 20, fontWeight: FontWeight.w400)),
+                          '${selectedDate.day}/${selectedDate.month}'
+                          '/${selectedDate.year}',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                       ),
                     ),
-                    FloatingActionButton(
-                      onPressed: () {
-                        addTask();
-                        Navigator.of(context).pop();
-                      },
-                      child: Icon(
-                        Icons.check,
-                        size: 30,
-                      ),
-                    ),
-                  ]))
-            ],
-          ),
-        ));
+                    ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                AppColors.primaryColor)),
+                        onPressed: () {
+                          addTask();
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Add',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ))
+                  ],
+                ))
+          ],
+        ),
+      ),
+    );
   }
 
-  void showCalender() async {
+  void showCalendar() async {
     var chosenDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime.now(),
         lastDate: DateTime.now().add(Duration(days: 365)));
-    selectedDate = chosenDate ?? selectedDate;
-    setState(() {});
+    if (chosenDate != null) {
+      selectedDate = chosenDate;
+      setState(() {});
+    }
+    // selectedDate = chosenDate ?? selectedDate ;
   }
 
   void addTask() {
@@ -120,8 +139,8 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       /// add task
       Task task = Task(
         title: title,
+        description: description,
         dateTime: selectedDate,
-        desc: desc,
       );
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       FirebaseUtils.addTaskToFireStore(task, userProvider.currentUser!.id!)

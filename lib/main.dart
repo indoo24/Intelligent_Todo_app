@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_app/auth/login/login_screen.dart';
-import 'package:todo_app/auth/register/regiter_screen.dart';
 import 'package:todo_app/home/home_screen.dart';
 import 'package:todo_app/my_theme_data.dart';
 import 'package:todo_app/provider/list_provider.dart';
 import 'package:todo_app/provider/user_provider.dart';
+
+import 'auth/register/register_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,7 @@ void main() async {
               messagingSenderId: '583743039074',
               projectId: 'todo-app-36d7d'))
       : await Firebase.initializeApp();
-  await FirebaseFirestore.instance.enableNetwork();
+  await FirebaseFirestore.instance.disableNetwork();
 
   runApp(MultiProvider(
     providers: [
@@ -48,7 +49,7 @@ class myApp extends StatelessWidget {
         HomeScreen.routeName: (context) => HomeScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
       },
-      locale: Locale(provider.appLanguage),
+      // locale: Locale(provider.appLanguage),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     );

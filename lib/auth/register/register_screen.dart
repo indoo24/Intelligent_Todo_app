@@ -6,16 +6,18 @@ import '../../app_colors.dart';
 import '../../dialog_utils.dart';
 import '../../firebase_utils.dart';
 import '../../home/home_screen.dart';
+import '../../model/my_user.dart';
 import '../../provider/user_provider.dart';
 import '../custome_text_form_field.dart';
-import '../register/register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
-  static const String routeName = 'login_screen';
-
+class RegisterScreen extends StatelessWidget {
+  static const String routeName = 'register_screen';
+  TextEditingController nameController = TextEditingController(text: 'Amira');
   TextEditingController emailController =
-      TextEditingController(text: 'yaso.kan@gmail.com');
+      TextEditingController(text: 'yaso.kan.com');
   TextEditingController passwordController =
+      TextEditingController(text: '123456');
+  TextEditingController confirmPasswordController =
       TextEditingController(text: '123456');
   var formKey = GlobalKey<FormState>();
 
@@ -36,8 +38,7 @@ class LoginScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             titleTextStyle: Theme.of(context).textTheme.titleMedium,
-            titleSpacing: 20,
-            title: Text('Login'),
+            title: Text('Create Account'),
             elevation: 0,
             backgroundColor: Colors.transparent,
             centerTitle: true,
@@ -53,12 +54,15 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(
                           height: MediaQuery.of(context).size.height * 0.25,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text(
-                            'Welcome Back!',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                        CustomTextFormField(
+                          label: 'User Name',
+                          controller: nameController,
+                          validator: (text) {
+                            if (text == null || text.trim().isEmpty) {
+                              return 'Please enter User Name.';
+                            }
+                            return null;
+                          },
                         ),
                         CustomTextFormField(
                           label: 'Email',
@@ -92,6 +96,21 @@ class LoginScreen extends StatelessWidget {
                             return null;
                           },
                         ),
+                        CustomTextFormField(
+                          label: 'Confirm Password',
+                          controller: confirmPasswordController,
+                          keyboardType: TextInputType.phone,
+                          obscureText: true,
+                          validator: (text) {
+                            if (text == null || text.trim().isEmpty) {
+                              return 'Please enter Confirm Password.';
+                            }
+                            if (text != passwordController.text) {
+                              return "Confirm Password doesn't match password";
+                            }
+                            return null;
+                          },
+                        ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ElevatedButton(
@@ -99,22 +118,16 @@ class LoginScreen extends StatelessWidget {
                                   backgroundColor: MaterialStateProperty.all(
                                       AppColors.primaryColor)),
                               onPressed: () {
-                                login(context);
+                                register(context);
                               },
                               child: Text(
-                                'Login',
+                                'Create Account',
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium!
                                     .copyWith(color: AppColors.whiteColor),
                               )),
                         ),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pushNamed(RegisterScreen.routeName);
-                            },
-                            child: Text("OR Create Account"))
                       ],
                     ))
               ],
@@ -125,49 +138,58 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void login(BuildContext context) async {
+  void register(BuildContext context) async {
     if (formKey.currentState?.validate() == true) {
       // register
       //todo: show loading
-      DialogUtils.showLoading(context: context, message: 'Waiting...');
+      DialogUtils.showLoading(context: context, message: 'Loading...');
       try {
-        final credential = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(
-                email: emailController.text, password: passwordController.text);
-        var user = await FirebaseUtils.readUserFromFireStore(
-            credential.user?.uid ?? '');
-        if (user == null) {
-          return;
-        }
+        final credential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+        MyUser myUser = MyUser(
+            id: credential.user?.uid ?? '',
+            name: nameController.text,
+            email: emailController.text);
         var userProvider = Provider.of<UserProvider>(context, listen: false);
-        userProvider.updateUser(user);
+        userProvider.updateUser(myUser);
+        await FirebaseUtils.addUserToFireStore(myUser);
         //todo: hide loading
         DialogUtils.hideLoading(context);
         //todo: show Message
         DialogUtils.showMessage(
             context: context,
-            content: 'Login Successfully',
+            content: 'Register Successfully',
             title: 'Success',
             posActionName: 'Ok',
             posAction: () {
               Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
             });
-
-        print('login successfully');
+        print('register successfully');
         print(credential.user?.uid ?? "");
       } on FirebaseAuthException catch (e) {
-        if (e.code == 'invalid-credential') {
+        if (e.code == 'weak-password') {
           //todo: hide loading
           DialogUtils.hideLoading(context);
           //todo: show Message
           DialogUtils.showMessage(
               context: context,
-              content:
-                  'The supplied auth credential is incorrect, malformed or has expired',
+              content: 'The password provided is too weak.',
               title: 'Error',
               posActionName: 'Ok');
-          print(
-              'The supplied auth credential is incorrect, malformed or has expired');
+          print('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          //todo: hide loading
+          DialogUtils.hideLoading(context);
+          //todo: show Message
+          DialogUtils.showMessage(
+              context: context,
+              content: 'The account already exists for that email.',
+              title: 'Error',
+              posActionName: 'Ok');
+          print('The account already exists for that email.');
         } else if (e.code == 'network-request-failed') {
           //todo: hide loading
           DialogUtils.hideLoading(context);

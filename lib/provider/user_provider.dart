@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/model/my_user.dart';
+
+import '../model/my_user.dart';
 
 class UserProvider extends ChangeNotifier {
   MyUser? currentUser;
