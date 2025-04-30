@@ -5,16 +5,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_app/auth/login/login_screen.dart';
-import 'package:todo_app/home/home_screen.dart';
-import 'package:todo_app/provider/firbase_provider.dart';
-import 'package:todo_app/provider/list_provider.dart';
-import 'package:todo_app/provider/select_language.dart';
-import 'package:todo_app/provider/select_theme.dart';
-import 'package:todo_app/provider/user_provider.dart';
-import 'package:todo_app/style/my_theme_data.dart';
+import 'package:todo_app/tabs/settings/settings_provider.dart';
+import 'package:todo_app/tabs/tasks/edit_task_screen.dart';
+import 'package:todo_app/tabs/tasks/tasks_provider.dart';
 
-import 'auth/register/register_screen.dart';
+import 'app_theme.dart';
+import 'auth/login_screen.dart';
+import 'auth/register_screen.dart';
+import 'auth/user_provider.dart';
+import 'home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,39 +26,51 @@ void main() async {
               projectId: 'todo-app-36d7d'))
       : await Firebase.initializeApp();
   await FirebaseFirestore.instance.disableNetwork();
+  var settingsProvider = SettingsProvider();
+  await settingsProvider.loadSettings();
 
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (context) => ListProvider()),
-      ChangeNotifierProvider(create: (context) => UserProvider()),
-      ChangeNotifierProvider(create: (context) => SelectLanguage()),
-      ChangeNotifierProvider(create: (context) => SelectTheme()),
-      ChangeNotifierProvider(create: (context) => FireBaseProvider()),
-    ],
-    child: myApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => TasksProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => settingsProvider,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserProvider(),
+        ),
+      ],
+      child: const TodoApp(),
+    ),
+  );
 }
 
-class myApp extends StatelessWidget {
+class TodoApp extends StatelessWidget {
+  const TodoApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<ListProvider>(context);
-    var languageProvider = Provider.of<SelectLanguage>(context);
-    var themeProvider = Provider.of<SelectTheme>(context);
-    return MaterialApp(
-      theme: MyThemeData.lightTheme,
-      debugShowCheckedModeBanner: false,
-      initialRoute: LoginScreen.routeName,
-      routes: {
-        RegisterScreen.routeName: (context) => RegisterScreen(),
-        HomeScreen.routeName: (context) => HomeScreen(),
-        LoginScreen.routeName: (context) => LoginScreen(),
-      },
-      themeMode: themeProvider.themeState,
-      darkTheme: MyThemeData.darkTheme,
-      locale: Locale(languageProvider.appLanguage),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-    );
+    SettingsProvider settingsProvider = Provider.of<SettingsProvider>(context);
+    return Consumer<SettingsProvider>(
+        builder: (BuildContext context, dynamic provider, Widget? child) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        routes: {
+          HomeScreen.routename: (_) => const HomeScreen(),
+          EditTaskScreen.routename: (_) => const EditTaskScreen(),
+          RegisterScreen.routeName: (_) => const RegisterScreen(),
+          LoginScreen.routeName: (_) => const LoginScreen(),
+        },
+        initialRoute: LoginScreen.routeName,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: SettingsProvider.themeMode,
+        theme: AppTheme.lighTheme,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: Locale(settingsProvider.language),
+      );
+    });
   }
 }
